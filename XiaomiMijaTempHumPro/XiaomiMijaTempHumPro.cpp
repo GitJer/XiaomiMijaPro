@@ -12,7 +12,7 @@ uint8_t S_dummy[1] = {0x00};
 uint8_t S_20_init[15] = {0x4A, 0x4A, 0x01, 0x8A, 0x8A, 0x01, 0x4A, 0x4A, 0x01, 0x8A, 0x8A, 0x01, 0x81, 0x81, 0x01};
 uint8_t S_20_normal[15] = {0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x81, 0x81, 0x01};
 uint8_t S_23_init[15] = {0x8A, 0x8A, 0x01, 0x8A, 0x8A, 0x01, 0x4A, 0x4A, 0x01, 0x4A, 0x4A, 0x01, 0x81, 0x81, 0x01};
-uint8_t S_23_normal[15] = {0x86, 0x86, 0x01, 0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x46, 0x46, 0x01, 0x81, 0x81, 0x01};
+uint8_t S_23_normal[15] = {0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x81, 0x81, 0x01};
 uint8_t S_24_normal[15] = {0x46, 0x46, 0x01, 0x46, 0x46, 0x01, 0x86, 0x86, 0x01, 0x86, 0x86, 0x01, 0x81, 0x81, 0x01};
 uint8_t S_25_normal[15] = {0x86, 0x86, 0x01, 0x86, 0x86, 0x01, 0x46, 0x46, 0x01, 0x46, 0x46, 0x01, 0x81, 0x81, 0x01};
 uint8_t S_26_init_1[15] = {0x4A, 0x4A, 0x01, 0x4A, 0x4A, 0x01, 0x8A, 0x8A, 0x01, 0x8A, 0x8A, 0x01, 0x81, 0x81, 0x01};
@@ -92,48 +92,48 @@ void XiaomiMijaTempHumPro::init()
 
     delay(100);
     // give a RST pulse
-    digitalWrite(IO_RST_N, 0);
-    delayMicroseconds(100);
-    digitalWrite(IO_RST_N, 1);
+    // digitalWrite(IO_RST_N, 0);
+    // delayMicroseconds(100);
+    // digitalWrite(IO_RST_N, 1);
 
-    // do the first block of init data.
-    transmit(0, CMD_04);
-    delay(100);
-    while (digitalRead(IO_BUSY_N) == 0)
-        delay(1);
-    transmit(0, CMD_00);
-    transmit(1, 0x0B);
-    transmit(0, CMD_01);
-    transmit(1, 0x46);
-    transmit(1, 0x46);
-    transmit(0, CMD_03);
-    transmit(1, 0x00);
-    transmit(0, CMD_30);
-    transmit(1, 0x02);
-    transmit(0, CMD_20);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_20_init[i]);
-    transmit(0, CMD_23);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_23_init[i]);
-    transmit(0, CMD_26);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_26_init_1[i]);
-    transmit(0, CMD_18);
-    for (int i = 0; i < 18; i++)
-        transmit(1, S_18_init_1[i]);
-    transmit(0, CMD_1C);
-    for (int i = 0; i < 18; i++)
-        transmit(1, S_1C_init_1[i]);
-    transmit(0, CMD_12);
-    delay(200);
-    while (digitalRead(IO_BUSY_N) == 0)
-        delay(1);
-    transmit(0, CMD_02);
-    transmit(1, 0x03);
-    delay(100);
+    // // do the first block of init data.
+    // transmit(0, CMD_04);
+    // delay(100);
+    // while (digitalRead(IO_BUSY_N) == 0)
+    //     delay(1);
+    // transmit(0, CMD_00);
+    // transmit(1, 0x0B);
+    // transmit(0, CMD_01);
+    // transmit(1, 0x46);
+    // transmit(1, 0x46);
+    // transmit(0, CMD_03);
+    // transmit(1, 0x00);
+    // transmit(0, CMD_30);
+    // transmit(1, 0x02);
+    // transmit(0, CMD_20);
+    // for (int i = 0; i < 15; i++)
+    //     transmit(1, S_20_init[i]);
+    // transmit(0, CMD_23);
+    // for (int i = 0; i < 15; i++)
+    //     transmit(1, S_23_init[i]);
+    // transmit(0, CMD_26);
+    // for (int i = 0; i < 15; i++)
+    //     transmit(1, S_26_init_1[i]);
+    // transmit(0, CMD_18);
+    // for (int i = 0; i < 18; i++)
+    //     transmit(1, S_18_init_1[i]);
+    // transmit(0, CMD_1C);
+    // for (int i = 0; i < 18; i++)
+    //     transmit(1, S_1C_init_1[i]);
+    // transmit(0, CMD_12);
+    // delay(200);
+    // while (digitalRead(IO_BUSY_N) == 0)
+    //     delay(1);
+    // transmit(0, CMD_02);
+    // transmit(1, 0x03);
+    // delay(100);
 
-    // give a second RST pulse
+    // // give a second RST pulse
     digitalWrite(IO_RST_N, 0);
     delayMicroseconds(100);
     digitalWrite(IO_RST_N, 1);
