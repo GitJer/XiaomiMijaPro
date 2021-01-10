@@ -9,6 +9,16 @@
 #include <Arduino.h>
 
 //----------------------------------
+// define pins (made such that it can easily connect the ESP8266 Wemos d1 mini
+// to the pin-to-flatflex connector)
+//----------------------------------
+#define SPI_ENABLE D7
+#define SPI_MOSI D6
+#define IO_RST_N D5
+#define SPI_CLOCK D1
+#define IO_BUSY_N D2
+
+//----------------------------------
 // define commands and settings
 //----------------------------------
 #define CMD_00 0x00
@@ -28,20 +38,9 @@
 #define CMD_30 0x30
 
 //----------------------------------
-// define pins (made such that it can easily connect the ESP8266 Wemos d1 mini
-// to the pin-to-flatflex connector)
-//----------------------------------
-#define SPI_ENABLE D7
-#define SPI_MOSI D6
-#define IO_RST_N D5
-#define SPI_CLOCK D1
-#define IO_BUSY_N D2
-
-//----------------------------------
 // define groups of segments into logical shapes
+// Note: first all the number types, then the shapes!
 //----------------------------------
-
-// note: first all the number types
 #define TIME1 1  // the high hours digit, example: time=13:48 -> 1
 #define TIME2 2  // the low hours digit, example: time=13:48 -> 3
 #define TIME3 3  // the high minutes digit, example: time=13:48 -> 4
@@ -65,20 +64,33 @@ class XiaomiMijaTempHumPro
 public:
     /*
      * Initialize the display
+     * @param redraw    should the screen should have an black-white redraw?
+     *                  redraw = 0: no redraw
+     *                  redraw != 0: do a redraw 
+     *                  normally redrawing is advisable (redraw != 0), 
+     *                  but e.g. when using deep-sleep you may want to
+     *                  initialize the screen without the black-white 
+     *                  transition
      */
-    void init();
+    void init(int redraw);
+
+    /* 
+     * Start building a new display
+    */
+    void start_new_screen();
 
     /*
-     * display the data
+     * send the data on the display
      */
     void write_display();
 
     /* 
      * Display a number at a specific place
      * @param number    The number to be displayed [0, 9]
-     * @param where     The location where to display the number: must be one of 
-     *                  TIME_1, TIME_2, TIME_3, TIME_4, DAY1, DAY2, MONTH1, MONTH2, 
-     *                  YEAR1, or YEAR2 
+     * @param where     The location where to display the number: must be 
+     *                  one of:
+     *                  TIME_1, TIME_2, TIME_3, TIME_4, DAY1, DAY2, MONTH1,
+     *                  MONTH2, YEAR1, or YEAR2 
      */
     void set_number(uint8_t number, uint8_t where);
 
@@ -97,11 +109,6 @@ public:
      * @param segment_bit   The bit in the byte
      */
     void set_segment(uint8_t segment_byte, uint8_t segment_bit);
-
-    /* 
-     * Start building a new display
-    */
-    void start_new_screen();
 
 private:
     /*

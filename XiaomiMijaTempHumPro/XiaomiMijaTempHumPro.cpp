@@ -72,7 +72,7 @@ int numbers[10][7] = {
     {1, 2, 3, 4, 6, 7, 0}  // 9
 };
 
-void XiaomiMijaTempHumPro::init()
+void XiaomiMijaTempHumPro::init(int redraw)
 {
     // set the pin modes (note: no hardware SPI is used)
     pinMode(SPI_ENABLE, OUTPUT);
@@ -89,91 +89,51 @@ void XiaomiMijaTempHumPro::init()
 
     // disable SPI (SPI enable is low active)
     digitalWrite(SPI_ENABLE, 1);
-
     delay(100);
-    // give a RST pulse
-    // digitalWrite(IO_RST_N, 0);
-    // delayMicroseconds(100);
-    // digitalWrite(IO_RST_N, 1);
 
-    // // do the first block of init data.
-    // transmit(0, CMD_04);
-    // delay(100);
-    // while (digitalRead(IO_BUSY_N) == 0)
-    //     delay(1);
-    // transmit(0, CMD_00);
-    // transmit(1, 0x0B);
-    // transmit(0, CMD_01);
-    // transmit(1, 0x46);
-    // transmit(1, 0x46);
-    // transmit(0, CMD_03);
-    // transmit(1, 0x00);
-    // transmit(0, CMD_30);
-    // transmit(1, 0x02);
-    // transmit(0, CMD_20);
-    // for (int i = 0; i < 15; i++)
-    //     transmit(1, S_20_init[i]);
-    // transmit(0, CMD_23);
-    // for (int i = 0; i < 15; i++)
-    //     transmit(1, S_23_init[i]);
-    // transmit(0, CMD_26);
-    // for (int i = 0; i < 15; i++)
-    //     transmit(1, S_26_init_1[i]);
-    // transmit(0, CMD_18);
-    // for (int i = 0; i < 18; i++)
-    //     transmit(1, S_18_init_1[i]);
-    // transmit(0, CMD_1C);
-    // for (int i = 0; i < 18; i++)
-    //     transmit(1, S_1C_init_1[i]);
-    // transmit(0, CMD_12);
-    // delay(200);
-    // while (digitalRead(IO_BUSY_N) == 0)
-    //     delay(1);
-    // transmit(0, CMD_02);
-    // transmit(1, 0x03);
-    // delay(100);
+    if (redraw != 0)
+    {
+        digitalWrite(IO_RST_N, 0);
+        delayMicroseconds(100);
+        digitalWrite(IO_RST_N, 1);
 
-    // // give a second RST pulse
-    digitalWrite(IO_RST_N, 0);
-    delayMicroseconds(100);
-    digitalWrite(IO_RST_N, 1);
-
-    // do the first block of init data.
-    transmit(0, CMD_04);
-    delay(100);
-    while (digitalRead(IO_BUSY_N) == 0)
-        delay(1);
-    transmit(0, CMD_00);
-    transmit(1, 0x0B);
-    transmit(0, CMD_01);
-    transmit(1, 0x46);
-    transmit(1, 0x46);
-    transmit(0, CMD_03);
-    transmit(1, 0x00);
-    transmit(0, CMD_30);
-    transmit(1, 0x02);
-    transmit(0, CMD_20);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_20_normal[i]);
-    transmit(0, CMD_23);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_23_normal[i]);
-    transmit(0, CMD_26);
-    for (int i = 0; i < 15; i++)
-        transmit(1, S_26_init_2[i]);
-    transmit(0, CMD_18);
-    for (int i = 0; i < 18; i++)
-        transmit(1, S_18_init_2[i]);
-    transmit(0, CMD_1C);
-    for (int i = 0; i < 18; i++)
-        transmit(1, S_1C_init_2[i]);
-    transmit(0, CMD_12);
-    delay(200);
-    while (digitalRead(IO_BUSY_N) == 0)
-        delay(1);
-    transmit(0, CMD_02);
-    transmit(1, 0x03);
-    delay(100);
+        // do the first block of init data.
+        transmit(0, CMD_04);
+        delay(100);
+        while (digitalRead(IO_BUSY_N) == 0)
+            delay(1);
+        transmit(0, CMD_00);
+        transmit(1, 0x0B);
+        transmit(0, CMD_01);
+        transmit(1, 0x46);
+        transmit(1, 0x46);
+        transmit(0, CMD_03);
+        transmit(1, 0x00);
+        transmit(0, CMD_30);
+        transmit(1, 0x02);
+        transmit(0, CMD_20);
+        for (int i = 0; i < 15; i++)
+            transmit(1, S_20_normal[i]);
+        transmit(0, CMD_23);
+        for (int i = 0; i < 15; i++)
+            transmit(1, S_23_normal[i]);
+        transmit(0, CMD_26);
+        for (int i = 0; i < 15; i++)
+            transmit(1, S_26_init_2[i]);
+        transmit(0, CMD_18);
+        for (int i = 0; i < 18; i++)
+            transmit(1, S_18_init_2[i]);
+        transmit(0, CMD_1C);
+        for (int i = 0; i < 18; i++)
+            transmit(1, S_1C_init_2[i]);
+        transmit(0, CMD_12);
+        delay(200);
+        while (digitalRead(IO_BUSY_N) == 0)
+            delay(1);
+        transmit(0, CMD_02);
+        transmit(1, 0x03);
+        delay(100);
+    }
 }
 
 void XiaomiMijaTempHumPro::write_display()
@@ -271,7 +231,7 @@ void XiaomiMijaTempHumPro::set_number(uint8_t number, uint8_t where)
 {
     // 'number' must be 0 to 9
     number = number % 10;
-    // 'where' must one of: TIME_1, TIME_2, TIME_3, TIME_4, DAY1, DAY2, MONTH1, MONTH2, YEAR1, or YEAR2.
+    // 'where' must one of the segment groups defined in the header file. Here: TIME_1, TIME_2, TIME_3, TIME_4, DAY1, DAY2, MONTH1, MONTH2, YEAR1, or YEAR2.
     uint8_t *segments;
     switch (where)
     {
