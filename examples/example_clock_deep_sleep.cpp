@@ -2,7 +2,8 @@
  * NOTES:
  * 
  * There needs to be a short between D0 and the RST on the esp8266. This 
- * allows the esp8266 to wake up after the specified Deep-Sleep time.
+ * allows the esp8266 to wake up after the specified Deep-Sleep time. 
+ * With this short in place programming is not possible.
  * 
  * During Deep-Sleep all GPIO values go to low, also the reset line to
  * the display. This means that the display thinks it is being reset and
@@ -42,6 +43,19 @@
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 #include "XiaomiMijaTempHumPro.h"
+
+// uncomment to see debug information via Serial
+// #define DEBUG
+
+// uncomment to use WiFiManager, if commented provide ssid and password
+// #define USE_WIFIMANAGER
+
+#ifndef USE_WIFIMANAGER
+// The SSID (name) of the Wi-Fi network you want to connect to
+const char *ssid = "Your SSID";
+// The password of the Wi-Fi network
+const char *password = "Your password";
+#endif
 
 // update via NTP once every DO_NTP_UPDATE seconds (typically an hour)
 #define DO_NTP_UPDATE 3600
@@ -138,9 +152,36 @@ uint32_t getNtpTime()
 // Get the time via NTP
 void do_NTP_update()
 {
+
+#ifdef USE_WIFIMANAGER
     // make connection with wifi
     wifiManager.setAPStaticIPConfig(IPAddress(10, 0, 1, 1), IPAddress(10, 0, 1, 1), IPAddress(255, 255, 255, 0));
     wifiManager.autoConnect("XIAOMI_10.0.1.1");
+#else
+    WiFi.begin(ssid, password);
+    int wifi_try_count = 0;
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(1000);
+        // add one second to the unix_time
+        rtc_data.unix_time += 1;
+        // max number of tries
+        wifi_try_count++;
+#ifdef DEBUG
+        Serial.print("wifi connect try:");
+        Serial.println(wifi_try_count);
+#endif
+        if (wifi_try_count > 10)
+            break;
+    }
+#endif
+
+#ifdef DEBUG
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.println("No WiFi connection");
+    }
+#endif
 
     if (WiFi.status() == WL_CONNECTED)
     {
@@ -153,6 +194,7 @@ void do_NTP_update()
             // there was a valid response from the NTP server
             rtc_data.valid_time = 1;
             rtc_data.secs_since_NTP = 0;
+            WiFi.disconnect();
             return;
         }
     }
@@ -204,15 +246,19 @@ void update_display()
         my_display.set_shape(FACE_HAPPY);
     // have dots between hours and minutes
     my_display.set_shape(TIMEDOTS);
-    // write the screen to the display
+// write the screen to the display
+#ifdef DEBUG
     Serial.println("doing write_display");
+#endif
     my_display.write_display();
 }
 
 void setup()
 {
+#ifdef DEBUG
     // allow serial printing
     Serial.begin(115200);
+#endif
     // init time variables with location
     setenv("TZ", "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00", 1);
     tzset();
@@ -251,6 +297,7 @@ void setup()
             // get the current time via NTP
             do_NTP_update();
             // also do a display redraw (cleans up stray black/white e-ink elements)
+            // Odly it works eventhough the RST_N line is always HIGH (connected to 3V3)
             my_display.init(1);
         }
     }

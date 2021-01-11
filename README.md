@@ -39,7 +39,7 @@ update occurs every minute.
 For Deep-Sleep:
 
 There needs to be a short between D0 and the RST on the esp8266. This 
-allows the esp8266 to wake up after the specified Deep-Sleep time.
+allows the esp8266 to wake up after the specified Deep-Sleep time. With this short in place programming is not possible. So, make the short in a way that can easily be broken and restored.
 
 During Deep-Sleep all GPIO values go to low, also the reset line to
 the display. This means that the display thinks it is being reset and
